@@ -344,6 +344,18 @@ Esas 3 apps irían en un POD o en 2 PODs
                                                                                 conectar con tomcat??? SI
                                                                                 http://appGuay
 
+Carlos escribe en su navegador: 
+http://appGuay                              gracias al DNS publico (de mi empresa)
+http://192.168.1.100:80                     gracias al balanceador externo al cluster
+http://192.168.1.10:31000                   gracias al netFilter (que tiene una regla que ha metido kube-proxy)
+nginx.prod.es:80                            coreDNS resuelve ese nombre
+http://172.100.100.2:80                     Esa IP la gestiona netFilter de la maquina 192.168.1.10 de quien es?
+                                                de un servicio? INGRESS CONTROLLER
+http://172.100.0.1:80                       Al POD   nginx (proxy reverso)   coreDNS resuelve ese nombre
+http://tomcat.prod.es:80                    Se aplica una regla de INGRESS  http://172.100.0.1:80 -> tomcat.prod.es:80 
+http://172.100.100.5:80                     IP DEL SERVICIO DE TOMCAT > netFilter    
+http://172.100.0.1:80                       IP de un POD de tomcat
+
 Esta configuración no la haríamos NUNCA. Por qué?
     tomcat1   --> MYSQL 172.100.0.3
 Las IPs de los PODs pueden cambiar? NO
