@@ -1,0 +1,23 @@
+
+# $ kubectl create ns NOMBRE
+# $ oc create project NOMBRE
+
+
+
+
+
+---
+# Esta la opción preferida. Queda guardado, registrado y lo puedo replicar
+
+kind:         Namespace
+apiVersion:   v1
+
+metadata:
+  name:       NOMBRE
+
+
+# $ kubectl apply -f RUTA_YAML
+# $ oc apply -f RUTA_YAML
+
+---
+# DAR PERMISOS

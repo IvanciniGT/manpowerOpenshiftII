@@ -1,0 +1,129 @@
+# Importantisimo
+# Esto suele darmelo desarrollo si es un desarrollo en la casa... si no, ni de coña
+# Y me lo tengo que currar yo como administrador, de nuevo.
+# Y meterlo en el deployment, statfulset, daemonset.yaml de turno 
+# O en el chart de helm
+# Algunos chart de helm muy buenos (BITNAMI) ya incluyen algunos presets en este sentido
+#       generateAntiAffinityWithSelf: True
+
+# Lo que pongamos en este fichero, realmente va dentro del fichero de despliegue del 
+# desarrollador. A nivel del spec del Template del Pod.
+# Esto es, dentro de un : DaemonSet, StatefulSet, Deployment
+
+# A nivel de etiquetas de PODS... cúal es la más famosa... utilizada?
+# "app"
+
+affinity:
+  podAffinity: 
+    # Quiero que los pods que se generen desde esta plantilla, vayan a una maquina que también tenga (quien? esa maquina) 
+    # los pods que aquí voy a detallar.
+    # En este ejemplo: Mi pod se va a instalar donde haya un pod con la etiqueta: MIETIQUETA=MIVALOR
+
+    # Usos? Web-BBDD    Web-Redis: NO LO USAMOS MUCHO....
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: MIETIQUETA
+              operador: In # NotIn Exists DoesNotExists Gt Lt
+              values:
+                - MIVALOR
+        topologyKey: kubernetes.io/hostname
+
+    preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 5
+          preference:
+            matchExpressions:
+            - key: almacenamiento
+              operador: In # NotIn Exists DoesNotExists Gt Lt
+              values:
+                - super-rapido
+            topologyKey: kubernetes.io/hostname
+        - weight: 3
+          preference:
+            matchExpressions:
+            - key: almacenamiento
+              operador: In # NotIn Exists DoesNotExists Gt Lt
+              values:
+                - rapido
+            topologyKey: kubernetes.io/hostname
+
+  podAntiAffinity: 
+    # Quiero que los pods que se generen desde esta plantilla, NI DE COÑA vayan a una maquina que también tenga 
+    # Los pods que aquí voy a detallar.
+    # En este ejemplo: Mi pod NO se va a instalar donde haya un pod con la etiqueta: MIETIQUETA=MIVALOR
+
+    # Usos?  SE USA MUCHISISISISISMO !!!!!!!!
+    #   - Pods que usen recursos del mismo tipo
+    #   - Quiero una app en cluster. 4 pods del weblogic... donde quiero cada weblogic... en una maquina distinta.
+    #         Por qué? Menos probabilidades de perder varios de golpe.
+
+#    requiredDuringSchedulingIgnoredDuringExecution:
+#      - labelSelector:
+#          matchExpressions:
+#            - key: MIETIQUETA
+#              operador: In # NotIn Exists DoesNotExists Gt Lt
+#              values:
+#                - MIVALOR
+
+    preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 5
+          preference:
+            matchExpressions:
+            - key: app
+              operador: In # NotIn Exists DoesNotExists Gt Lt
+              values:
+                - weblogic
+          topologyKey: kubernetes.io/hostname
+
+### IMPORTANTISIMO !!!
+# Una antiafinidad de operacion IN no es igual NUNCA y OJO CON ESTO a una afinidad de tipo NotIn
+
+# Quiero montar un pod con "app: weblogic" nuevo en este cluster
+#                     antiaffinity: app In weblogic             affinity: app NotIn weblogic
+#                     Antiafinidad conmigo                      Afinidad No conmigo
+# Maquina 1
+#   app: weblogic             X                                       X
+# Maquina 2
+#   app: mysql                √                                       √
+# Maquina 3
+#   app: weblogic             X                                       √    CASO DE DIFERENCIA
+#   app: mysql
+# Maquina 4                   √                                       X    CASO DE DIFERENCIA
+#
+
+
+
+---
+
+
+# EJEMPLO MAS COMPLEJO
+
+affinity:
+  podAffinity: 
+    # Quiero que los pods que se generen desde esta plantilla, vayan a una maquina que también tenga (quien? esa cliente) 
+    # los pods que aquí voy a detallar.
+    # En este ejemplo: 
+    # Mi pod se instalará en cualquier nodo de una region que tenga en alguno de sus nodo un pod con etiqueta app: bbdd
+
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app
+              operador: In
+              values:
+                - bbdd
+        topologyKey: cliente
+
+# Quiero  montar un pod weblogic en un nodo de este cluster... con la especificacion de arriba.
+# En que maquina(s) podrá ir?
+
+# Cluster:
+---
+#  Maquina 1: cliente A               √
+#    app: bbdd
+#  Maquina 2: cliente A               √
+#  Maquina 3: cliente A               √
+---
+#  Maquina 3: cliente B
+#  Maquina 4: cliente B
+

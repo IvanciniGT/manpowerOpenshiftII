@@ -1,0 +1,70 @@
+# Limita un namespace completo
+
+kind:         ResourceQuota
+apiVersion:   v1              # La libreria que recoje la definición de ese objeto
+                              #     libreria/version
+                              # Solamente para la libreria base de kubernetes
+                              #     version
+metadata:
+  name:       NOMBRE
+  namespace:  NAMESPACE AL QUE APLICA       # Este tiene prioridad
+    # Esto se puede poner aqui, o? al hacer kubectl apply -f FICHERO -n NAMESPACE
+
+  # ^^^ Namespace: Esto se puede hacer en kubernetes con cualquier tipo de objeto
+  # Eso no se hace "nunca".. Quiero más flexibilidad, y decidir en tiempo de ejecución:
+  # Pod, secret
+  # Salvo para ResourceQuotas y LimitRanges, que lo habitual es ponerlo
+
+spec:
+  hard:
+    # Lo máximo que pueden pedir que se les garantice
+    cpu:      "0.25"  # 250    milicores
+    #requests.cpu: "0.25" Igual a la de arriba
+    memory:   10Gi # 1024
+    #requests.memory:   10Gi Igual a la de arriba
+
+    # Lo máximo que pueden llegar a usar.. si hay hueco
+    limits.cpu:    4
+    limits.memory: 20Gi
+
+    # Con respecto al almacenamiento:
+    persistentvolumeclaims:      "5"      # Número de volumenes que pueden llegar a pedir
+    requests.storage:            "200Gi"  # Cuanto espacio en total
+    ## Limitar a nivel de TIPO DE ALMACENAMIENTO
+    <STORAGE_CLASS>.storageClass.storage.k8s.io/persistentvolumeclaims: 100Gi
+    <STORAGE_CLASS>.storageClass.storage.k8s.io/requests.storage:       "1"
+    
+    # <STORAGE_CLASS> es un nombre de storageClass válido en mi cluster, de los que tenga definidos
+
+
+    # Menos habitual
+    services.loadbalancers: "0" # < IP PUBLICA + BALANCEADOR EXTERNO
+
+    # Mas raros
+    pods:     "10"
+    secrets:  "5"
+    services: "10"
+
+
+# $ kubectl apply -f RUTA_YAML
+# $ oc apply -f RUTA_YAML
+
+# Otra forma? Interfaz web, igual... NECESITO EL YAML
+
+# Qué significa 4 cpus? 
+#  Eso no significa que le reservo 4 cpus "fisicas" para esa app
+#  Le permito usar el equivalente a 4 cpus al 100% de continuo
+#       Esto podria significar que está usando 8 CPUS al 50% de continuo
+# Qué significa 2500 milicores? Esto sería igual que haber escrito 2.5 cores
+#       Esto podria significar que está usando 5 CPUS al 50% de continuo
+
+# $ kubectl describe quota NOMBRE_RESOURCE_QUOTE --namespace=NOMBRE
+# $ oc describe quota NOMBRE_RESOURCE_QUOTE --project=NOMBRE ( namespace)
+
+# Vemos los limites que hay establecidos y lo que hay en uso
+
+#        LIMITE         USO    <<< COMPROMETIDOS
+# ---------------------------
+# cpu:      4             3
+# memory:   10Gi          8
+# pods:     "10"          5

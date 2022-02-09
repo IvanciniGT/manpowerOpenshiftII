@@ -317,3 +317,104 @@ Tenga control de lo que hay ahi y tenga claro como se comporta
 Maquina 32 Gbs
     App 1- 9-23 20 gbs   12
     App 2  23-9 20 gbs   12
+
+
+
+# Producción Openshift / Kubernetes
+
+N Maquinas... quiero hacer el mejor uso posible de ellas.
+M aplicaciones en cluster que va desde 1 replica hasta 50 replicas.
+
+Tengo HA si tengo 1 replica de una app? Si: Cluster Activo/Pasivo
+Cuando antes configurabamos un cluster activo/pasivo, necesitaba 2 entornos duplicados. (desperdicio de recursos)
+Escalado se hace dinámicamente de forma casi instantanea.
+Me interesa tener pods pequeños. Muchos.
+
+                %CPU        %MEMORIA   Incrementar escalado
+App1:A      
+App1:B
+App1:C    
+App1:D    
+------------------------------------------------------------
+                60%            70%
+
+Autoescalado quien lo configura? Desarrollo / ADMINISTRADOR
+10 PODS : 3 pods 70% --> Escalo arriba
+
+Pod: 16 Gbs de RAM y 2 CPUs x 4
+    RAM de una app?
+        Datos de trabajo
+        Caches se multiplican
+
+App1:A      su juego de datos de trabajo... de las peticiones que ella está atendiendo  + CACHE \  % de duplicación enorme 
+App1:B      su juego de datos de trabajo... de las peticiones que ella está atendiendo  + CACHE /
+
+1 copia de la app           16 Gbs de RAM
+
+2 copias                    12 Gbs de RAM
+                            12 Gbs de RAM
+
+REDIS, Oracle COHERENCE / Weblogic
+
+
+
+App... necesita datos de la BBDD: App que vende entradas de conciertos. 
+                                  App quiere en la RAM el listado de todos los conciertos que hay en un momento dado.
+                                  Esos datos donde están? Donde tienen persistencia? Una BBDD
+
+Aplicacion la tengo replicada en maquinas distintas: En las dos maquinas voy a tener en RAM el listado de todos los concierto
+
+Si se cae alguien... en 1 minuto hay otro arriba.
+
+
+Tradicional:                    CPU     MEMORIA           PETICIONES/min
+App1-copia 1 < Servidor          25%      25%             1000 
+App1-copia 2                     25%      25%             1000             
+App1-copia 3                     25%      25%             1000             
+App1-copia 4                     25%      25%             1000 
+
+Tradicional:                    CPU     MEMORIA           PETICIONES/min
+App1-copia 1 < Servidor          25%      25%             1000 
+App1-copia 2                     25%      25%             1000             
+App1-copia 3                     25%      25%             1000             
+App1-copia 4                     25%      25%             1000 
+
+
+Tradicional:                    CPU     MEMORIA           PETICIONES/min
+App1-copia 1 < Servidor          25%      25%             1000 
+App1-copia 2                     25%      25%             1000             
+App1-copia 3                     25%      25%             1000             
+App1-copia 4                     25%      25%             1000 
+
+
+Si se caen 3... necesito que la que queda siga en marcha... porque el problemaes CUANTO ME VA A LLEVAR PONER LAS OTRAS 3 en funcionamiento
+
+Probabilidad de que una falle? 1/100
+2 maquinas: 2 fallen a la vez? 1/10000
+3 maquinas: 3 fallen a la vez? 1/1000000
+4 maquinas: 4 fallen a la vez? 1/100000000
+Cluster 50 maquinas. 4/5 maquinas de reserva
+
+
+Desarrollo me da el dato de RAM necesario? Me va pedir el garantizado? COMPLEJO 
+De entrada, desarrollo no tiene ni idea de cuanta RAM necesita su sistema. 
+El que desarrolla no tiene ni idea del uso real del sistema
+
+MONITORIZACION ! Esta es la UNICA fuente fiable
+
+Desarrollo en el pod me dice : Garantiza 3 Gbs de RAM... en el YAML que metemos en kubernetes/os < NO VALE PARA "NADA"
+                                                                                            Es una medida de protección
+Donde más debe estar esa info?Y ALLI EN PRIMER LUGAR:  En la configuración de la app.
+
+arranca un app java: ES, Weblogic, Websphere, MySQL... yo le digo a cuanta memoria quiero que acceda.
+                                                ^3 Gbs
+                                                POD le garantizo 16Gbs... Estoy haciendo el tonto
+¿Cuando para de coger RAM una BBDD?  NUNCA. Lo primero va a subir las tablas y los indices a RAM, Query RAM, y se mantiene en caches... Eh 1 tienes 4 Gbs
+¿Cuando para de coger RAM una app JAVA? NUNCA. Garbage collection ...Cuando quiere...  Cuando ve que aquello va apretado
+
+HELM < en ese YAML que se crea se dan 2 datos: 
+    - Limite de memoria de la app en Kubernetes
+    - Limite de memoria configurable en la app <> Garantizar lo que se ponga a la app/proceso (no al pod)
+
+
+

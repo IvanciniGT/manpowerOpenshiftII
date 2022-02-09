@@ -1,0 +1,83 @@
+# Lo que pongamos en este fichero, realmente va dentro del fichero de despliegue del 
+# desarrollador. A nivel del spec del Template del Pod.
+# Esto es, dentro de un : DaemonSet, StatefulSet, Deployment
+#
+# Para añadir una etiqueta a un nodo
+# $ kubectl label node NODO MIETIQUETA=MIVALOR
+#
+# Para consultar las etiquetas de un nodo
+# $ kubectl describe node NODO
+# Kubernetes me da unas etiquetas de serie:
+# - kubernetes.io/hostname *** SE USA MUCHO... 
+#                          en otros escenarios: AFINIDAD/ANTIAFINIDAD A NIVEL DE POD
+# - kubernetes.io/arch
+
+# OPCION 0: NO USAR BAJO PENA CAPITAL
+nodeName: NOMBRE DE UN NODO
+
+# Lo usamos NUNCA. Por qué? como se caiga el nodo, me quedo sin servicio
+
+# OPCION 1
+# Esto hace que los pods que se creen según la plantilla donde se añada este bloque
+# SOLO se planfifiquen en nodos con esa etiqueta establecida.
+# 
+# NOTAS:
+#   sencillo de usar pero poco potente. En algunos casos cuela...no tantos
+
+nodeSelector: 
+  MIETIQUETA: MIVALOR
+
+
+# ******** OPCION 2 ********
+# Esta más compleja de escribir... pero mucho mas potente
+
+affinity:
+  nodeAffinity:
+    # Aplica solo durante la fase de Scheduling, la asignación
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: MIETIQUETA
+            operador: In # NotIn Exists DoesNotExists Gt Lt
+            values:
+              - MIVALOR
+        - matchExpressions:
+          - key: CPUS
+            operador: Gt
+            values:
+              - "8"
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operador: In
+            values:
+              - nodo1
+              - nodo3
+              - nodo7
+                
+
+    preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 5
+          preference:
+            matchExpressions:
+            - key: almacenamiento
+              operador: In # NotIn Exists DoesNotExists Gt Lt
+              values:
+                - super-rapido
+        - weight: 3
+          preference:
+            matchExpressions:
+            - key: almacenamiento
+              operador: In # NotIn Exists DoesNotExists Gt Lt
+              values:
+                - rapido
+    # Previsto: requiredDuringSchedulingRequiredDuringExecution:
+    # Mi opcion del profe... no le hagais ni caso: ESTO NO VA A SALIR NUNCA: 
+    # Esta previsto desde hace más de 6 años...
+
+
+
+
+
+
+
+

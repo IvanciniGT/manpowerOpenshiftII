@@ -1,0 +1,53 @@
+# Impone límites a nivel de un POD o CONTENEDOR dentro de un Namespace
+# Esto me complica en 2 factores:
+#   Optimizar el aprovechamiento de mi hardware
+#   Facilitar un escalado más gradual
+
+kind:         LimitRange
+apiVersion:   v1              # La libreria que recoje la definición de ese objeto
+                              #     libreria/version
+                              # Solamente para la libreria base de kubernetes
+                              #     version
+metadata:
+  name:       NOMBRE
+  namespace:  NAMESPACE AL QUE APLICA     
+
+spec:
+  limits:
+    - # Esto aplicaría a cualquier contenedor que crease en el NS dentro de cualquier POD
+      type: Container
+      # Si el desarrollador no indica nada: lo que le voy a garantizar para ese contenedor
+      defaultRequest:
+        cpu:    100m
+        memory: 128Mi
+      # Si el desarrollador no indica nada: lo máximo que le permitiré usar para ese contenedor
+      default:
+        cpu:    100m
+        memory: 500Mi
+      # Lo mínimo que puede pedir que le garantice
+      min:
+        cpu:    100m
+        memory: 128Mi
+      # Lo máximo que puede pedir que le garantice
+      max:
+        cpu:    2000m
+        memory: 2048Mi
+
+    - # Esto aplicaría a cualquier POD  que crease en el NS
+      type: Pod
+          # Si el desarrollador no indica nada: lo que le voy a garantizar para ese contenedor
+      defaultRequest:
+        cpu:    100m
+        memory: 128Mi
+      # Si el desarrollador no indica nada: lo máximo que le permitiré usar para ese contenedor
+      default:
+        cpu:    100m
+        memory: 500Mi
+      # Lo mínimo que puede pedir que le garantice
+      min:
+        cpu:    100m
+        memory: 128Mi
+      # Lo máximo que puede pedir que le garantice
+      max:
+        cpu:    2000m
+        memory: 2048Mi
