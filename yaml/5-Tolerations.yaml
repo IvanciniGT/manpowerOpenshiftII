@@ -1,0 +1,15 @@
+
+tolerations:
+  - key:      gpu
+    operator: equal           # Exists . En este caso, no se da valor
+    value:    true
+    effect:   NoSchedule
+
+  - key:      gpu
+    operator: equal           # Exists . En este caso, no se da valor
+    value:    true
+    effect:   NoSchedule
+
+
+
+    
