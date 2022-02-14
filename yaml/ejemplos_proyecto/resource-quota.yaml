@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ResourceQuota
+
+
+metadata:
+  name: resource-quota-ivan
+  namespace: ivan
+
+
+spec:
+  hard:
+    pods: '2'             # Número máximo de pods que se pueden crear allí dentro
+    requests.cpu: '1'     # CPU que garantizamos a este proyecto
+      #cpu: "1"
+    limits.cpu: '1500m'       # Máximo que se podrá llegar a usar por los pod/job de este proyecto
+    requests.memory: 1Gi
+      #memory: "1Gi"
+    limits.memory: 2Gi
+
+    # Almacenamiento
+    persistentvolumeclaims:      "2"    # Número de volumenes que pueden llegar a pedir
+    requests.storage:            "2Gi"  # Cuanto espacio en total
+
+# jobs: scripts
+# pods: servicios + demonios
+# Si me paso en el uso de CPU... 
+#   se le cierra el grifo de la CPU (encolar peticiones a la CPU)
+# Si me paso en el uso de memoria...
+#   se reinicia los procesos (pods/jobs) que haga falta
+
+# Para cargar esto desde un cli:
+# Kubernetes:
+#  $ kubectl apply -f FICHERO -n ivan # OJO: el "-n ivan" solo si no lo di en el fichero
+# OpenShift:
+#  $ oc create -f FICHERO
+
+# apply: Crea algo si no existe... si existe lo modifica... si es posible
+        # Si el tipo de modificación no es posible hacerla con el objeto creado..me dará un error.
+        # Hay que borrar el objeto de turno
+        #  $ kubectl delete -f FICHERO_LOCAL
+        #  $ kubectl delete TIPO NOMBRE -n NAMESPACE
+        #  $ kubectl delete resourcequota resource-quota-ivan -n ivan
+        
+        
+# create: Crea algo... ojo,... SI NO EXISTE... SI EXISTE PETA !

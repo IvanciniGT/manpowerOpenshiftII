@@ -1,0 +1,51 @@
+# flannel: MUY SENCILLO DE IMPLEMENTAR / instalar. No ejecuta las networkpolicies
+# calico:  Network Policies
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+
+metadata: 
+  name: reglas-red-elasticsearch
+  namespace: elasticsearch
+  # 5 pods de ES... que se tienen que comunicar entre si: 9300
+
+spec:
+  podSelector:
+    matchLabels: 
+      app: elasticsearch
+    # En ES tenemos 2 puertos: 9200 y 9300
+    # 9200 comunicaciones externas, que expongo a los usuarios
+    # 9300 comunicaciones internas: Cluster
+  policyTypes:
+    - Ingress   # Quién puede conectarse con los pods (app: app2)
+    - Egress    # A donde pueden conectar los pods (app: app2)
+  
+  # Si yo no defino un network policy, por defecto todo está abierto
+  # En cuento defino un network policy: TODO SE CIERRA, salvo lo expresamente abierto
+  ingress:
+    - from:   # Limitar el 9300 a los pods del mismo namespace
+        - podSelector:
+            matchLabels: 
+              app: elasticsearch
+        - namespaceSelector:
+            matchLabels: 
+              app: elasticsearch
+      ports:
+        - port: 9300
+          protocol: tcp    
+
+    - from: # Abriendo el 9200 a todo el mundo
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 9200
+          protocol: tcp
+
+    -
+    -
+
+
+  egress:
+    -
+    -
+    -

@@ -1,0 +1,44 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: deployment-ivan
+  namespace: ivan
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: nginx
+
+  template:
+
+    affinity:
+      nodeAffinity:
+        # Aplica solo durante la fase de Scheduling, la asignación
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+              - key: disco
+                operador: In # NotIn Exists DoesNotExists Gt Lt
+                values:
+                  - rapido
+
+    nodeSelector: 
+      disco: rapido
+
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - resources:
+            limits:
+              cpu: '1'
+              memory: 200Mi
+            requests:
+              cpu: '100m'
+              memory: 100Mi
+          name: nginx
+          ports:
+            - containerPort: 80
+          image: 'bitnami/nginx:latest'

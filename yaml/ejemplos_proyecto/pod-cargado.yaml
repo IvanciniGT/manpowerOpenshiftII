@@ -1,0 +1,230 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pod-ivan-1
+  namespace: ivan
+  uid: 0a808869-bfdc-4df8-b949-f6a6d49580f6
+  resourceVersion: '2381897'
+  creationTimestamp: '2022-02-14T16:56:24Z'
+  annotations:
+    k8s.v1.cni.cncf.io/network-status: |-
+      [{
+          "name": "openshift-sdn",
+          "interface": "eth0",
+          "ips": [
+              "10.131.1.152"
+          ],
+          "default": true,
+          "dns": {}
+      }]
+    k8s.v1.cni.cncf.io/networks-status: |-
+      [{
+          "name": "openshift-sdn",
+          "interface": "eth0",
+          "ips": [
+              "10.131.1.152"
+          ],
+          "default": true,
+          "dns": {}
+      }]
+    openshift.io/scc: anyuid
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: v1
+      time: '2022-02-14T16:56:24Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          'f:containers':
+            'k:{"name":"nginx"}':
+              .: {}
+              'f:image': {}
+              'f:imagePullPolicy': {}
+              'f:name': {}
+              'f:ports':
+                .: {}
+                'k:{"containerPort":80,"protocol":"TCP"}':
+                  .: {}
+                  'f:containerPort': {}
+                  'f:protocol': {}
+              'f:resources':
+                .: {}
+                'f:limits':
+                  .: {}
+                  'f:cpu': {}
+                  'f:memory': {}
+                'f:requests':
+                  .: {}
+                  'f:cpu': {}
+                  'f:memory': {}
+              'f:terminationMessagePath': {}
+              'f:terminationMessagePolicy': {}
+          'f:dnsPolicy': {}
+          'f:enableServiceLinks': {}
+          'f:restartPolicy': {}
+          'f:schedulerName': {}
+          'f:securityContext': {}
+          'f:terminationGracePeriodSeconds': {}
+    - manager: multus
+      operation: Update
+      apiVersion: v1
+      time: '2022-02-14T16:56:26Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:k8s.v1.cni.cncf.io/network-status': {}
+            'f:k8s.v1.cni.cncf.io/networks-status': {}
+      subresource: status
+    - manager: kubelet
+      operation: Update
+      apiVersion: v1
+      time: '2022-02-14T16:56:35Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:conditions':
+            'k:{"type":"ContainersReady"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Initialized"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Ready"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+          'f:containerStatuses': {}
+          'f:hostIP': {}
+          'f:phase': {}
+          'f:podIP': {}
+          'f:podIPs':
+            .: {}
+            'k:{"ip":"10.131.1.152"}':
+              .: {}
+              'f:ip': {}
+          'f:startTime': {}
+      subresource: status
+spec:
+  restartPolicy: Always
+  serviceAccountName: default
+  imagePullSecrets:
+    - name: default-dockercfg-gkzbt
+  priority: 0
+  schedulerName: default-scheduler
+  enableServiceLinks: true
+  terminationGracePeriodSeconds: 30
+  preemptionPolicy: PreemptLowerPriority
+  nodeName: ip-10-0-174-206.eu-west-1.compute.internal
+  securityContext:
+    seLinuxOptions:
+      level: 's0:c32,c4'
+  containers:
+    - resources:
+        limits:
+          cpu: '1'
+          memory: 2Gi
+        requests:
+          cpu: '1'
+          memory: 1Gi
+      terminationMessagePath: /dev/termination-log
+      name: nginx
+      securityContext:
+        capabilities:
+          drop:
+            - MKNOD
+      ports:
+        - containerPort: 80
+          protocol: TCP
+      imagePullPolicy: Always
+      volumeMounts:
+        - name: kube-api-access-jld7s
+          readOnly: true
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      terminationMessagePolicy: File
+      image: 'nginx:latest'
+  serviceAccount: default
+  volumes:
+    - name: kube-api-access-jld7s
+      projected:
+        sources:
+          - serviceAccountToken:
+              expirationSeconds: 3607
+              path: token
+          - configMap:
+              name: kube-root-ca.crt
+              items:
+                - key: ca.crt
+                  path: ca.crt
+          - downwardAPI:
+              items:
+                - path: namespace
+                  fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.namespace
+          - configMap:
+              name: openshift-service-ca.crt
+              items:
+                - key: service-ca.crt
+                  path: service-ca.crt
+        defaultMode: 420
+  dnsPolicy: ClusterFirst
+  tolerations:
+    - key: node.kubernetes.io/not-ready
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+    - key: node.kubernetes.io/unreachable
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+    - key: node.kubernetes.io/memory-pressure
+      operator: Exists
+      effect: NoSchedule
+status:
+  phase: Running
+  conditions:
+    - type: Initialized
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2022-02-14T16:56:24Z'
+    - type: Ready
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2022-02-14T16:56:35Z'
+    - type: ContainersReady
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2022-02-14T16:56:35Z'
+    - type: PodScheduled
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2022-02-14T16:56:24Z'
+  hostIP: 10.0.174.206
+  podIP: 10.131.1.152
+  podIPs:
+    - ip: 10.131.1.152
+  startTime: '2022-02-14T16:56:24Z'
+  containerStatuses:
+    - restartCount: 0
+      started: true
+      ready: true
+      name: nginx
+      state:
+        running:
+          startedAt: '2022-02-14T16:56:34Z'
+      imageID: >-
+        docker.io/library/nginx@sha256:2834dc507516af02784808c5f48b7cbe38b8ed5d0f4837f16e78d00deb7e7767
+      image: 'docker.io/library/nginx:latest'
+      lastState: {}
+      containerID: 'cri-o://7a7359bc5ff9304a813e077f3a5981ebf0631379ca4be3742375f019da55a77b'
+  qosClass: Burstable

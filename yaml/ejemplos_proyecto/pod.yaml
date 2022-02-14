@@ -1,0 +1,18 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pod-NOMBRE-1
+  namespace: NOMBRE
+spec:
+  containers:
+    - resources:
+        limits:
+          cpu: '1'
+          memory: 2Gi
+        requests:
+          cpu: '100m'
+          memory: 100Mi
+      name: nginx
+      ports:
+        - containerPort: 80
+      image: 'nginx:latest'

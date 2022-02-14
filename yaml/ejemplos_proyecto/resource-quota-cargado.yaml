@@ -1,0 +1,85 @@
+kind: ResourceQuota
+apiVersion: v1
+metadata:
+  name: resource-quota-ivan
+  namespace: ivan
+  uid: 4f0e83dd-6d1a-4818-baf4-8afdb3ebce66
+  resourceVersion: '2373665'
+  creationTimestamp: '2022-02-14T16:35:40Z'
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: v1
+      time: '2022-02-14T16:35:40Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          'f:hard':
+            .: {}
+            'f:limits.cpu': {}
+            'f:limits.memory': {}
+            'f:persistentvolumeclaims': {}
+            'f:pods': {}
+            'f:requests.cpu': {}
+            'f:requests.memory': {}
+            'f:requests.storage': {}
+    - manager: cluster-policy-controller
+      operation: Update
+      apiVersion: v1
+      time: '2022-02-14T16:35:40Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:hard':
+            .: {}
+            'f:limits.cpu': {}
+            'f:limits.memory': {}
+            'f:persistentvolumeclaims': {}
+            'f:pods': {}
+            'f:requests.cpu': {}
+            'f:requests.memory': {}
+            'f:requests.storage': {}
+      subresource: status
+    - manager: kube-controller-manager
+      operation: Update
+      apiVersion: v1
+      time: '2022-02-14T16:35:40Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:used':
+            .: {}
+            'f:limits.cpu': {}
+            'f:limits.memory': {}
+            'f:persistentvolumeclaims': {}
+            'f:pods': {}
+            'f:requests.cpu': {}
+            'f:requests.memory': {}
+            'f:requests.storage': {}
+      subresource: status
+spec:
+  hard:
+    limits.cpu: 1500m
+    limits.memory: 2Gi
+    persistentvolumeclaims: '2'
+    pods: '2'
+    requests.cpu: '1'
+    requests.memory: 1Gi
+    requests.storage: 2Gi
+status:
+  hard:
+    limits.cpu: 1500m
+    limits.memory: 2Gi
+    persistentvolumeclaims: '2'
+    pods: '2'
+    requests.cpu: '1'
+    requests.memory: 1Gi
+    requests.storage: 2Gi
+  used:
+    limits.cpu: '0'
+    limits.memory: '0'
+    persistentvolumeclaims: '0'
+    pods: '0'
+    requests.cpu: '0'
+    requests.memory: '0'
+    requests.storage: '0'
