@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: example
+  namespace: ivan                   #######################
+spec:
+  podSelector:
+    matchLabels:
+      role: db                      #######################
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              project: myproject    #######################
+        - podSelector:
+            matchLabels:
+              role: somerole        #######################
+      ports:
+        - protocol: TCP             #######################
+          port: 6379                #######################
+
+# Cualquier pod con la etiqueta "role:somerole" 
+# del proyecto con etiqueta "project:myproject" 
+# pueden conectar al puerto 6379 por protocolo tcp
+# A todos pods del proyecto "Ivan" que tengan etiqueta "role:db".
+
+# Y se deniega el acceso a todo lo demás.

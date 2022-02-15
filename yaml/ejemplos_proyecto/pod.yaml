@@ -4,6 +4,9 @@ metadata:
   name: pod-NOMBRE-1
   namespace: NOMBRE
 spec:
+  initContainers:
+    - name: # EJECUTAN UN SCRIPT
+      image:
   containers:
     - resources:
         limits:
